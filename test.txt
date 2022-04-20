@@ -1,0 +1,5 @@
+docker build . --tag xxxx
+docker run -p 5000:5000 -it -v /home/gabriel/work/liquid/broken-filename-service/data:/data  xxxx
+
+echo "AAAAA" > data/xxx
+curl -XPOST http://localhost:5000/get-object -H 'Content-Type: application/json' -d '{"path_base64":"eHh4"}'

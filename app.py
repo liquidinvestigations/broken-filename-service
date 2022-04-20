@@ -17,7 +17,8 @@ def get_object():
     if cl is not None and cl > MAX_REQUEST_SIZE:
         log.error('req size too large!')
         abort(413)
-    filepath = base64.b64decode(request.get_json()['path_base64']).decode(errors="surrogateescape")
+    base64_path = request.get_json()['path_base64']
+    filepath = base64.b64decode(base64_path).decode('utf8', errors="surrogateescape")
     return send_file(DATA_PATH / filepath)
 
 
