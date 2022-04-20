@@ -1,0 +1,9 @@
+#!/bin/bash -ex
+
+cd "$(dirname ${BASH_SOURCE[0]})"
+
+exec gunicorn -b 0.0.0.0:5000 \
+  --name broken-filenames-service \
+  --threads 30 \
+  --max-requests 40 --max-requests-jitter 30 \
+  app:app
