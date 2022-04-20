@@ -11,6 +11,22 @@ MAX_REQUEST_SIZE = 100 * 1024  # 100 KB
 DATA_PATH = Path('/data')
 
 
+@app.route('/get-stat', methods=['POST'])
+def get_stat():
+    cl = request.content_length
+    if cl is not None and cl > MAX_REQUEST_SIZE:
+        log.error('req size too large!')
+        abort(413)
+    base64_path = request.get_json()['path_base64']
+    filepath = base64.b64decode(base64_path).decode('utf8', errors="surrogateescape")
+    stat = (DATA_PATH / filepath).stat()
+    return {
+        'size': stat.st_size,
+        'ctime': stat.st_ctime,
+        'mtime': stat.st_mtime,
+    }, 200
+
+
 @app.route('/get-object', methods=['POST'])
 def get_object():
     cl = request.content_length

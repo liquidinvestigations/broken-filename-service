@@ -17,5 +17,6 @@ The file outputs will be returned.
 
 ## Routes
 
-- `POST /get-object` -- download object with base64-encoded filename
-- `GET  /health`     -- returns `{"status": "ok"}`
+- `POST /get-object` -- Download object with base64-encoded filename.
+- `POST /get-stat`   -- Run os.stat() on the object with base64-encoded filename. Returns dict with "size", "ctime", "mtime".
+- `GET  /health`     -- Returns `{"status": "ok"}`.
