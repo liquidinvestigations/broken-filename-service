@@ -55,9 +55,18 @@ def get_object():
         abort(413)
     base64_path = request.get_json()['path_base64']
     filepath = base64.b64decode(base64_path).decode('utf8', errors="surrogateescape")
-    return send_file(DATA_PATH / filepath,
+    filepath = DATA_PATH / filepath
+
+    # generate etag
+    stat = filepath.stat()
+    mtime = int(stat.st_mtime)
+    size = int(stat.st_size)
+    base64_hash = hash(base64_path)
+    etag = f'{mtime}-{size}-{base64_hash}'
+    return send_file(filepath,
                      mimetype='application/octet-stream',
-                     download_name='object')
+                     download_name='object',
+                     etag=etag)
 
 
 @app.route('/health', methods=['GET'])
