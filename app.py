@@ -11,6 +11,26 @@ MAX_REQUEST_SIZE = 100 * 1024  # 100 KB
 DATA_PATH = Path('/data')
 
 
+@app.route('/get-list', methods=['POST'])
+def get_list():
+    cl = request.content_length
+    if cl is not None and cl > MAX_REQUEST_SIZE:
+        log.error('req size too large!')
+        abort(413)
+    base64_path = request.get_json()['path_base64']
+    dirpath = base64.b64decode(base64_path).decode('utf8', errors="surrogateescape")
+
+    return {'list': [
+        {
+            'is_dir': d.is_dir(),
+            'name_bytes': base64.b64encode(
+                d.name.encode('utf8', errors='surrogateescape'),
+            ).decode(),
+        }
+        for d in (DATA_PATH / dirpath).iterdir()
+    ]}, 200
+
+
 @app.route('/get-stat', methods=['POST'])
 def get_stat():
     cl = request.content_length

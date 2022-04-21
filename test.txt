@@ -1,5 +1,18 @@
+#!/bin/bash -ex
+docker rm -f test-xxxx || true
 docker build . --tag xxxx
-docker run -p 5000:5000 -it -v /home/gabriel/work/liquid/broken-filename-service/data:/data  xxxx
+docker run -p 5000:5000 --rm --name test-xxxx -d -v /home/gabriel/work/liquid/broken-filename-service/data:/data  xxxx
 
 echo "AAAAA" > data/xxx
+until curl -XGET http://localhost:5000/health ; do sleep 1; done
+
 curl -XPOST http://localhost:5000/get-object -H 'Content-Type: application/json' -d '{"path_base64":"eHh4"}'
+curl -XPOST http://localhost:5000/get-object -H 'Content-Type: application/json' -d '{"path_base64":"eHh4"}' | grep AAAAA
+
+curl -XPOST http://localhost:5000/get-stat -H 'Content-Type: application/json' -d '{"path_base64":"eHh4"}'
+curl -XPOST http://localhost:5000/get-stat -H 'Content-Type: application/json' -d '{"path_base64":"eHh4"}' | grep "size"
+
+curl -XPOST http://localhost:5000/get-list -H 'Content-Type: application/json' -d '{"path_base64":""}'
+curl -XPOST http://localhost:5000/get-list -H 'Content-Type: application/json' -d '{"path_base64":""}' | grep is_dir
+
+docker rm -f test-xxxx
